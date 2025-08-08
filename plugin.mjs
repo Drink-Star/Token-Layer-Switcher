@@ -1,4 +1,3 @@
-// plugin.mjs
 export default {
   id: "token-layer-switcher",
   name: "Token Layer Switcher",
