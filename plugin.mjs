@@ -20,17 +20,36 @@ export default {
       });
     };
 
-    api.onTokenContextMenu(async ({ token, menu }) => {
+    api.onTokenContextMenu(({ token, menu }) => {
       menu.addItem("Alternar Camada", () => switchLayer(token));
     });
 
-    api.onTokenEdit(async ({ token, form }) => {
-      const input = form.addCustomHTML("Camadas (URLs separadas por vírgula)");
+    api.onTokenEdit(({ token, form }) => {
       const layers = token.metadata?.layers?.join(",") ?? "";
-      input.innerHTML = `<input type="text" id="layerInput" value="${layers}" style="width: 100%" />`;
+
+      // Cria um container para o input
+      const container = document.createElement("div");
+      container.style.marginTop = "0.5em";
+
+      const label = document.createElement("label");
+      label.textContent = "Camadas (URLs separadas por vírgula):";
+      label.htmlFor = "layerInput";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = "layerInput";
+      input.style.width = "100%";
+      input.value = layers;
+
+      container.appendChild(label);
+      container.appendChild(input);
+      form.addCustomElement(container);
 
       form.onSubmit(() => {
-        const newLayers = document.getElementById("layerInput").value.split(",").map(x => x.trim()).filter(Boolean);
+        const newLayers = input.value
+          .split(",")
+          .map(x => x.trim())
+          .filter(Boolean);
         if (newLayers.length > 0) {
           api.setToken(token.id, {
             metadata: {
